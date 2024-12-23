@@ -1,0 +1,574 @@
+Problem 1: Convert Sorted Array to Binary Search Tree
+
+Given an integer array nums where the elements are sorted in ascending order, convert it to a height-balanced binary search tree.
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return helper(nums, 0, nums.size() - 1);
+    }
+
+private:
+    TreeNode* helper(vector<int>& nums, int left, int right) {
+        // Base case: if the left index exceeds the right index
+        if (left > right) {
+            return nullptr;
+        }
+
+        // Find the middle element
+        int mid = left + (right - left) / 2;
+
+        // Create the current node with the middle element
+        TreeNode* node = new TreeNode(nums[mid]);
+
+        // Recursively build the left and right subtrees
+        node->left = helper(nums, left, mid - 1);
+        node->right = helper(nums, mid + 1, right);
+
+        return node;
+    }
+};
+
+// Helper function to print the tree in pre-order traversal
+void preOrder(TreeNode* root) {
+    if (!root) {
+        return;
+    }
+    cout << root->val << " ";
+    preOrder(root->left);
+    preOrder(root->right);
+}
+
+int main() {
+    Solution sol;
+    vector<int> nums = {-10, -3, 0, 5, 9};
+
+    TreeNode* root = sol.sortedArrayToBST(nums);
+
+    cout << "Pre-order Traversal of the Height-Balanced BST: ";
+    preOrder(root);
+
+    return 0;
+}
+
+
+
+
+Problem 2:-  Valid Sudoku
+
+Determine if a 9 x 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+Each row must contain the digits 1-9 without repetition. Each column must contain the digits 1-9 without repetition.Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+
+Note:A Sudoku board (partially filled) could be valid but is not necessarily solvable.
+Only the filled cells need to be validated according to the mentioned rules.
+
+
+
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+using namespace std;
+
+class Solution {
+public:
+    bool isValidSudoku(vector<vector<char>>& board) {
+        // Vectors to store sets for rows, columns, and sub-boxes
+        vector<unordered_set<char>> rows(9);
+        vector<unordered_set<char>> cols(9);
+        vector<unordered_set<char>> boxes(9);
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                char num = board[i][j];
+                if (num == '.') continue; // Skip empty cells
+                
+                // Calculate the index for the corresponding 3x3 box
+                int boxIndex = (i / 3) * 3 + (j / 3);
+
+                // Check if the current number already exists in the corresponding row, column, or box
+                if (rows[i].count(num) || cols[j].count(num) || boxes[boxIndex].count(num)) {
+                    return false;
+                }
+
+                // Add the current number to the corresponding row, column, and box
+                rows[i].insert(num);
+                cols[j].insert(num);
+                boxes[boxIndex].insert(num);
+            }
+        }
+        return true; // All checks passed
+    }
+};
+
+int main() {
+    Solution sol;
+    vector<vector<char>> board = {
+        {'5', '3', '.', '.', '7', '.', '.', '.', '.'},
+        {'6', '.', '.', '1', '9', '5', '.', '.', '.'},
+        {'.', '9', '8', '.', '.', '.', '.', '6', '.'},
+        {'8', '.', '.', '.', '6', '.', '.', '.', '3'},
+        {'4', '.', '.', '8', '.', '3', '.', '.', '1'},
+        {'7', '.', '.', '.', '2', '.', '.', '.', '6'},
+        {'.', '6', '.', '.', '.', '.', '2', '8', '.'},
+        {'.', '.', '.', '4', '1', '9', '.', '.', '5'},
+        {'.', '.', '.', '.', '8', '.', '.', '7', '9'}
+    };
+
+    bool result = sol.isValidSudoku(board);
+    cout << (result ? "Valid Sudoku" : "Invalid Sudoku") << endl;
+
+    return 0;
+}
+
+
+
+Remove Element
+
+Problem:-3 Given an integer array nums sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once. The relative order of the elements
+should be kept the same. Then return the number of unique elements in nums..
+
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if (nums.empty()) return 0; // Handle edge case of an empty array
+        
+        int uniqueIndex = 0; // Points to the position of the last unique element
+        
+        for (int i = 1; i < nums.size(); i++) {
+            if (nums[i] != nums[uniqueIndex]) {
+                uniqueIndex++; // Move the unique index forward
+                nums[uniqueIndex] = nums[i]; // Place the next unique element
+            }
+        }
+        
+        // The number of unique elements is uniqueIndex + 1
+        return uniqueIndex + 1;
+    }
+};
+
+int main() {
+    vector<int> nums = {1, 1, 2, 2, 3, 4, 4, 5}; // Sorted input array
+    Solution sol;
+    int uniqueCount = sol.removeDuplicates(nums);
+
+    cout << "Number of unique elements: " << uniqueCount << endl;
+    cout << "Updated array: ";
+    for (int i = 0; i < uniqueCount; i++) {
+        cout << nums[i] << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
+
+
+Problem 4:- Design a system in C++ that uses a linked list to simulate a real-time task scheduler for a multi-threaded operating system.
+Each node in the linked list represents a task, containing attributes like a unique task ID, task priority, estimated execution time, and 
+a pointer to the next task. The linked list must dynamically adapt to new tasks being added, tasks completing, or tasks being pre-empted 
+based on their priority. Implement functionality to insert tasks into the list in priority order (higher priority tasks come first), remove 
+tasks upon completion, and dynamically reallocate execution slots if a higher priority task is added mid-execution. Additionally, the system should
+support a circular linked list to handle periodic tasks that need to re-enter the scheduling queue after a defined time interval. The 
+implementation must ensure efficient memory usage and handle edge cases, such as managing tasks with the same priority, handling an empty 
+task queue, and dealing with corrupted nodes. The program should output the current state of the task list, showing the order of execution 
+and periodically updating it as tasks are added, completed, or preempted in real-time. This problem challenges your understanding of advanced 
+linked list manipulation, dynamic memory management, and multi-threaded system simulation.
+
+
+#include <iostream>
+#include <string>
+#include <thread>
+#include <mutex>
+#include <chrono>
+
+using namespace std;
+
+struct Task {
+    int taskID;
+    int priority;
+    int estimatedExecutionTime; // in milliseconds
+    int period; // For periodic tasks, re-add after this interval, 0 for non-periodic
+    Task* next;
+
+    Task(int id, int pr, int time, int per)
+        : taskID(id), priority(pr), estimatedExecutionTime(time), period(per), next(nullptr) {}
+};
+
+class TaskScheduler {
+private:
+    Task* head;
+    mutex taskMutex;
+
+    // Function to insert a task into the list based on priority
+    void insertTask(Task* newTask) {
+        lock_guard<mutex> lock(taskMutex);
+
+        if (!head) {
+            // If the list is empty
+            head = newTask;
+            head->next = head; // Circular reference
+            return;
+        }
+
+        // Insert in priority order
+        Task* current = head;
+        Task* prev = nullptr;
+
+        do {
+            if (current->priority < newTask->priority) break;
+            prev = current;
+            current = current->next;
+        } while (current != head);
+
+        // Insert the task
+        newTask->next = current;
+        if (prev) {
+            prev->next = newTask;
+            if (current == head && newTask->priority > head->priority) head = newTask;
+        } else {
+            // Adding at the head
+            Task* tail = head;
+            while (tail->next != head) tail = tail->next;
+
+            tail->next = newTask;
+            newTask->next = head;
+            head = newTask;
+        }
+    }
+
+    // Remove a task from the list
+    void removeTask(Task* target) {
+        lock_guard<mutex> lock(taskMutex);
+
+        if (!head) return;
+
+        Task* current = head;
+        Task* prev = nullptr;
+
+        do {
+            if (current == target) {
+                if (prev) prev->next = current->next;
+                if (current == head) {
+                    if (current->next == head) head = nullptr; // Only one task
+                    else head = current->next;
+                }
+                delete current;
+                return;
+            }
+            prev = current;
+            current = current->next;
+        } while (current != head);
+    }
+
+public:
+    TaskScheduler() : head(nullptr) {}
+
+    ~TaskScheduler() {
+        while (head) removeTask(head);
+    }
+
+    void addTask(int id, int priority, int executionTime, int period = 0) {
+        Task* newTask = new Task(id, priority, executionTime, period);
+        insertTask(newTask);
+    }
+
+    void runScheduler() {
+        while (true) {
+            taskMutex.lock();
+            if (!head) {
+                taskMutex.unlock();
+                cout << "Task queue empty. Waiting for new tasks...\n";
+                this_thread::sleep_for(chrono::seconds(2));
+                continue;
+            }
+            Task* currentTask = head;
+            taskMutex.unlock();
+
+            cout << "Executing Task ID: " << currentTask->taskID
+                 << ", Priority: " << currentTask->priority
+                 << ", Estimated Execution Time: " << currentTask->estimatedExecutionTime << "ms\n";
+
+            this_thread::sleep_for(chrono::milliseconds(currentTask->estimatedExecutionTime));
+
+            // Re-add periodic tasks or remove completed tasks
+            taskMutex.lock();
+            if (currentTask->period > 0) {
+                Task* periodicTask = new Task(currentTask->taskID, currentTask->priority, currentTask->estimatedExecutionTime, currentTask->period);
+                insertTask(periodicTask);
+            }
+            Task* taskToRemove = currentTask;
+            currentTask = currentTask->next;
+            removeTask(taskToRemove);
+            taskMutex.unlock();
+        }
+    }
+};
+
+int main() {
+    TaskScheduler scheduler;
+
+    // Adding tasks
+    scheduler.addTask(1, 2, 300); // ID, Priority, Execution Time
+    scheduler.addTask(2, 1, 500);
+    scheduler.addTask(3, 3, 200);
+    scheduler.addTask(4, 2, 400, 1000); // Periodic task (repeats every 1 second)
+
+    // Run the scheduler in a separate thread
+    thread schedulerThread(&TaskScheduler::runScheduler, &scheduler);
+
+    // Simulate dynamic task addition
+    this_thread::sleep_for(chrono::seconds(5));
+    scheduler.addTask(5, 5, 100);
+
+    schedulerThread.join();
+
+    return 0;
+}
+
+
+
+Problem 5:-  Design a train reservation system in C++ using linked lists to manage bookings for multiple trains, each with several compartments. 
+Each compartment has a fixed number of seats, and passengers can book, cancel, or check the availability of seats for
+specific compartments. Additionally, the system should dynamically allocate memory for new bookings and keep track of canceled seats efficiently
+
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+struct Seat {
+    int seatNumber;
+    bool isBooked;
+
+    Seat(int num) : seatNumber(num), isBooked(false) {}
+};
+
+struct Compartment {
+    int compartmentID;
+    int totalSeats;
+    vector<Seat> seats;
+    Compartment* next;
+
+    Compartment(int id, int seatCount) : compartmentID(id), totalSeats(seatCount), next(nullptr) {
+        for (int i = 1; i <= totalSeats; ++i) {
+            seats.emplace_back(i);
+        }
+    }
+};
+
+struct Train {
+    int trainID;
+    string trainName;
+    Compartment* compartments;
+    Train* next;
+
+    Train(int id, const string& name) : trainID(id), trainName(name), compartments(nullptr), next(nullptr) {}
+};
+
+class TrainReservationSystem {
+private:
+    Train* head;
+
+    Train* findTrain(int trainID) {
+        Train* current = head;
+        while (current) {
+            if (current->trainID == trainID) return current;
+            current = current->next;
+        }
+        return nullptr;
+    }
+
+    Compartment* findCompartment(Compartment* compartmentHead, int compartmentID) {
+        Compartment* current = compartmentHead;
+        while (current) {
+            if (current->compartmentID == compartmentID) return current;
+            current = current->next;
+        }
+        return nullptr;
+    }
+
+public:
+    TrainReservationSystem() : head(nullptr) {}
+
+    ~TrainReservationSystem() {
+        while (head) {
+            Train* tempTrain = head;
+            head = head->next;
+
+            Compartment* compHead = tempTrain->compartments;
+            while (compHead) {
+                Compartment* tempComp = compHead;
+                compHead = compHead->next;
+                delete tempComp;
+            }
+            delete tempTrain;
+        }
+    }
+
+    void addTrain(int trainID, const string& trainName) {
+        Train* newTrain = new Train(trainID, trainName);
+        newTrain->next = head;
+        head = newTrain;
+        cout << "Train " << trainName << " added successfully.\n";
+    }
+
+    void addCompartment(int trainID, int compartmentID, int totalSeats) {
+        Train* train = findTrain(trainID);
+        if (!train) {
+            cout << "Train with ID " << trainID << " not found.\n";
+            return;
+        }
+
+        Compartment* newCompartment = new Compartment(compartmentID, totalSeats);
+        newCompartment->next = train->compartments;
+        train->compartments = newCompartment;
+        cout << "Compartment " << compartmentID << " with " << totalSeats << " seats added to train " << trainID << ".\n";
+    }
+
+    void bookSeat(int trainID, int compartmentID) {
+        Train* train = findTrain(trainID);
+        if (!train) {
+            cout << "Train with ID " << trainID << " not found.\n";
+            return;
+        }
+
+        Compartment* compartment = findCompartment(train->compartments, compartmentID);
+        if (!compartment) {
+            cout << "Compartment with ID " << compartmentID << " not found in train " << trainID << ".\n";
+            return;
+        }
+
+        for (Seat& seat : compartment->seats) {
+            if (!seat.isBooked) {
+                seat.isBooked = true;
+                cout << "Seat " << seat.seatNumber << " booked in Train " << trainID << ", Compartment " << compartmentID << ".\n";
+                return;
+            }
+        }
+
+        cout << "No available seats in Train " << trainID << ", Compartment " << compartmentID << ".\n";
+    }
+
+    void cancelSeat(int trainID, int compartmentID, int seatNumber) {
+        Train* train = findTrain(trainID);
+        if (!train) {
+            cout << "Train with ID " << trainID << " not found.\n";
+            return;
+        }
+
+        Compartment* compartment = findCompartment(train->compartments, compartmentID);
+        if (!compartment) {
+            cout << "Compartment with ID " << compartmentID << " not found in train " << trainID << ".\n";
+            return;
+        }
+
+        for (Seat& seat : compartment->seats) {
+            if (seat.seatNumber == seatNumber) {
+                if (seat.isBooked) {
+                    seat.isBooked = false;
+                    cout << "Seat " << seatNumber << " canceled in Train " << trainID << ", Compartment " << compartmentID << ".\n";
+                } else {
+                    cout << "Seat " << seatNumber << " is already vacant.\n";
+                }
+                return;
+            }
+        }
+
+        cout << "Seat " << seatNumber << " not found in Train " << trainID << ", Compartment " << compartmentID << ".\n";
+    }
+
+    void checkAvailability(int trainID, int compartmentID) {
+        Train* train = findTrain(trainID);
+        if (!train) {
+            cout << "Train with ID " << trainID << " not found.\n";
+            return;
+        }
+
+        Compartment* compartment = findCompartment(train->compartments, compartmentID);
+        if (!compartment) {
+            cout << "Compartment with ID " << compartmentID << " not found in train " << trainID << ".\n";
+            return;
+        }
+
+        int availableSeats = 0;
+        for (const Seat& seat : compartment->seats) {
+            if (!seat.isBooked) availableSeats++;
+        }
+
+        cout << "Compartment " << compartmentID << " in Train " << trainID << " has " << availableSeats << " available seats.\n";
+    }
+
+    void displayTrainInfo() {
+        Train* currentTrain = head;
+        if (!currentTrain) {
+            cout << "No trains available.\n";
+            return;
+        }
+
+        while (currentTrain) {
+            cout << "\nTrain ID: " << currentTrain->trainID << ", Train Name: " << currentTrain->trainName << "\n";
+            Compartment* currentCompartment = currentTrain->compartments;
+            while (currentCompartment) {
+                cout << "  Compartment ID: " << currentCompartment->compartmentID
+                     << ", Total Seats: " << currentCompartment->totalSeats << "\n";
+                int bookedSeats = 0;
+                for (const Seat& seat : currentCompartment->seats) {
+                    if (seat.isBooked) bookedSeats++;
+                }
+                cout << "  Booked Seats: " << bookedSeats << ", Available Seats: " << (currentCompartment->totalSeats - bookedSeats) << "\n";
+                currentCompartment = currentCompartment->next;
+            }
+            currentTrain = currentTrain->next;
+        }
+    }
+};
+
+int main() {
+    TrainReservationSystem system;
+
+    // Add trains
+    system.addTrain(101, "Express");
+    system.addTrain(102, "Superfast");
+
+    // Add compartments
+    system.addCompartment(101, 1, 50);
+    system.addCompartment(101, 2, 30);
+    system.addCompartment(102, 1, 40);
+
+    // Book seats
+    system.bookSeat(101, 1);
+    system.bookSeat(101, 1);
+    system.bookSeat(101, 2);
+
+    // Cancel seat
+    system.cancelSeat(101, 1, 1);
+
+    // Check availability
+    system.checkAvailability(101, 1);
+
+    // Display train information
+    system.displayTrainInfo();
+
+    return 0;
+}
+
